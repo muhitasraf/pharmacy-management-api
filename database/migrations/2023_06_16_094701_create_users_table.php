@@ -18,14 +18,10 @@ return new class extends Migration
             $table->string('full_name',50);
             $table->string('user_name',50)->unique();
             $table->string('address',50)->nullable();
-            $table->string('image',100)->nullable();
+            // $table->string('image',100)->nullable();
             $table->string('contact_number',20);
             $table->string('email',50)->unique();
-            $table->timestamp('email_verified_at')->nullable();
             $table->string('password',200);
-            $table->rememberToken();
-            $table->integer('created_by')->nullable();
-            $table->integer('updated_by')->nullable();
             $table->timestamps();
         });
     }
