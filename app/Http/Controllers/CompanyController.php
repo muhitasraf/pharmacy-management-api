@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use PDOException;
 
 class CompanyController extends Controller
 {
@@ -16,7 +17,11 @@ class CompanyController extends Controller
     {
         $title = 'Company List';
         $company_list = DB::table('company')->get();
-        return view('company/index',compact('title','company_list'));
+        return response()->json([
+            'success' => true,
+            'message' => $title,
+            'data' => $company_list
+        ],200);
     }
 
     /**
@@ -26,8 +31,7 @@ class CompanyController extends Controller
      */
     public function create()
     {
-        $title = 'Create New company';
-        return view('company/create',compact('title'));
+
     }
 
     /**
@@ -43,19 +47,26 @@ class CompanyController extends Controller
             'company_email' => $request->company_email,
             'company_number' => $request->company_number,
             'company_address' => $request->company_address,
-            'status' => $request->company_status,
+            'status' => $request->status,
             'created_by' => 1,
             'created_at' => date('Y-m-d'),
             'updated_by' => 1,
             'updated_at' => date('Y-m-d'),
         ];
-        $result = DB::table('company')->insert($company_data);
-        if($result){
-            // notification(['type'=>'success', 'message'=>'Create Successfully']);
-            return redirect('company');
-        }else{
-            // notification(['type'=>'error', 'message'=>'Failed To Cteate']);
-            return redirect('company');
+
+        try{
+            $result = DB::table('company')->insert($company_data);
+            if($result){
+                return response()->json([
+                    'success' => true,
+                    'message' => "CREATED",
+                ],422);
+            }
+        }catch(PDOException $e){
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ],422);
         }
     }
 
@@ -69,7 +80,11 @@ class CompanyController extends Controller
     {
         $title = 'Company Info';
         $company_data = DB::table('company')->where('id', $id)->first();
-        return view('company/show',compact('title','company_data'));
+        return response()->json([
+            'success' => true,
+            'message' => $title,
+            'data' => $company_data
+        ],200);
     }
 
     /**
@@ -82,7 +97,11 @@ class CompanyController extends Controller
     {
         $title = 'Edit Comopany';
         $company_data = DB::table('company')->where('id', $id)->first();
-        return view('company/edit',compact('title','company_data'));
+        return response()->json([
+            'success' => true,
+            'message' => $title,
+            'data' => $company_data
+        ],200);
     }
 
     /**
@@ -99,13 +118,24 @@ class CompanyController extends Controller
             'company_email' => $request->company_email,
             'company_number' => $request->company_number,
             'company_address' => $request->company_address,
-            'status' => $request->company_status,
+            'status' => $request->status,
             'updated_by' => 1,
             'updated_at' => date('Y-m-d'),
         ];
-        $result = DB::table('company')->where('id',$id)->update($company_data);
-        if($result){
-            return redirect('company');
+
+        try{
+            $result = DB::table('company')->where('id',$id)->update($company_data);
+            if($result){
+                return response()->json([
+                    'success' => true,
+                    'message' => "UPDATED",
+                ],422);
+            }
+        }catch(PDOException $e){
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ],422);
         }
     }
 
@@ -117,11 +147,19 @@ class CompanyController extends Controller
      */
     public function destroy($id)
     {
-        $result = DB::table('company')->where('id',$id)->delete();
-        if($result){
-            return redirect('company');
-        }else{
-            return redirect('company');
+        try{
+            $result = DB::table('company')->where('id',$id)->delete();
+            if($result){
+                return response()->json([
+                    'success' => true,
+                    'message' => "DELETED",
+                ],200);
+            }
+        }catch(PDOException $e){
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ],422);
         }
     }
 }

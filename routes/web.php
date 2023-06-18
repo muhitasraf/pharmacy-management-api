@@ -42,7 +42,12 @@ $router->group(['prefix'=>'api/v1'], function () use ($router) {
         $router->put('brands/update/{id}','BrandController@update');
         $router->delete('brands/delete/{id}','BrandController@destroy');
 
-
+        $router->get('company','CompanyController@index');
+        $router->post('company/create','CompanyController@store');
+        $router->get('company/{id}','CompanyController@show');
+        $router->get('company/{id}/edit','CompanyController@edit');
+        $router->put('company/update/{id}','CompanyController@update');
+        $router->delete('company/delete/{id}','CompanyController@destroy');
 
     });
 
