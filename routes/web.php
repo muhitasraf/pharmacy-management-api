@@ -2,8 +2,6 @@
 
 /** @var \Laravel\Lumen\Routing\Router $router */
 
-// use App\Http\Controllers\UserController;
-
 /*
 |--------------------------------------------------------------------------
 | Application Routes
@@ -14,16 +12,40 @@
 | and give it the Closure to call when that URI is requested.
 |
 */
+
 $router->get('/', function () {
     return response()->json([
         'success' => 'true',
         'message' => 'There is no data!',
     ]);
 });
-$router->group(['prefix'=>'api/v1'], function () use ($router) {
-    // return $router->app->version();
-    // $router->get('user/create',[UserController::class, 'create']);
 
-    $router->get('user','UserController@index');
-    $router->post('user/create','UserController@create');
+$router->group(['prefix'=>'api/v1'], function () use ($router) {
+
+    $router->post( '/login', 'AuthController@login');
+
+    $router->group(['middleware' => 'auth:api'], function( $router ) {
+        // User Functions
+        $router->get( '/logout', 'AuthController@logout' );
+        $router->post( '/logout', 'AuthController@logout' );
+        $router->get( '/refresh', 'AuthController@refresh' );
+        $router->post( '/refresh', 'AuthController@refresh' );
+
+        $router->get('me','AuthController@me');
+        $router->get('user','UserController@index');
+        $router->post('user/create','UserController@create');
+
+        $router->get('brands','BrandController@index');
+        $router->post('brands/create','BrandController@store');
+        $router->get('brands/{id}','BrandController@show');
+        $router->get('brands/{id}/edit','BrandController@edit');
+        $router->put('brands/update/{id}','BrandController@update');
+        $router->delete('brands/delete/{id}','BrandController@destroy');
+
+
+
+    });
+
+
 });
+

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
+class CreateCompanyTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,12 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('generics', function (Blueprint $table) {
+        Schema::create('company', function (Blueprint $table) {
             $table->id();
-            $table->string('generic_name',250)->collation('utf8_general_ci');
-            $table->text('dose')->collation('utf8_general_ci')->nullable();
-            $table->text('mode_of_action')->collation('utf8_general_ci')->nullable();
+            $table->string('company_name',250)->unique();
+            $table->string('company_email',50)->nullable();
+            $table->string('company_number',50)->nullable();
+            $table->string('company_address',150)->nullable();
             $table->tinyInteger('status')->default(1);
             $table->tinyInteger('created_by')->nullable();
             $table->tinyInteger('updated_by')->nullable();
@@ -32,6 +33,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('generics');
+        Schema::dropIfExists('company');
     }
-};
+}
