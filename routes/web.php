@@ -56,6 +56,13 @@ $router->group(['prefix'=>'api/v1'], function () use ($router) {
         $router->put('customer/update/{id}','CustomerController@update');
         $router->delete('customer/delete/{id}','CustomerController@destroy');
 
+        $router->get('generic','GenericController@index');
+        $router->post('generic/create','GenericController@store');
+        $router->get('generic/{id}','GenericController@show');
+        $router->get('generic/{id}/edit','GenericController@edit');
+        $router->put('generic/update/{id}','GenericController@update');
+        $router->delete('generic/delete/{id}','GenericController@destroy');
+
     });
 
 

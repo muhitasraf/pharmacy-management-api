@@ -115,11 +115,11 @@ class CustomerController extends Controller
     public function update(Request $request, $id)
     {
         $customer_data = [
-            'full_name' => $request->customer_name,
+            'full_name' => $request->full_name,
             'contact_number' => $request->contact_number,
-            'address' => $request->customer_address,
+            'address' => $request->address,
             'customer_type' => $request->customer_type,
-            'status' => $request->customer_status,
+            'status' => $request->status,
             'created_by' => 1,
             'created_at' => date('Y-m-d'),
             'updated_by' => 1,

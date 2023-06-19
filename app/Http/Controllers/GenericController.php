@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use PDOException;
 
 class GenericController extends Controller
 {
@@ -16,7 +17,11 @@ class GenericController extends Controller
     {
         $title = 'All Generic List';
         $generic_name = DB::table('generic')->get();
-        return view('generic/index',compact('title','generic_name'));
+        return response()->json([
+            'success' => true,
+            'message' => $title,
+            'data' => $generic_name
+        ],200);
     }
 
     /**
@@ -26,8 +31,8 @@ class GenericController extends Controller
      */
     public function create()
     {
-        $title = 'Create New Generic/Group';
-        return view('generic/create',compact('title'));
+        // $title = 'Create New Generic/Group';
+        // return view('generic/create',compact('title'));
     }
 
     /**
@@ -38,17 +43,29 @@ class GenericController extends Controller
      */
     public function store(Request $request)
     {
+        // return $request->all();
         $generic_data = [
-            'generic_name' => $request['generic_name'],
-            'dose' => $request['dose'],
-            'mode_of_action' => $request['mode_of_action'],
-            'status' => $request['status'],
+            'generic_name' => $request->generic_name,
+            'dose' => $request->dose,
+            'mode_of_action' => $request->mode_of_action,
+            'status' => $request->status,
             'created_by' => 1,
             'created_at' => date('Y-m-d')
         ];
-        $result = DB::table('generic')->insert($generic_data);
-        if($result){
-            return redirect('generic');
+
+        try{
+            $result = DB::table('generic')->insert($generic_data);
+            if($result){
+                return response()->json([
+                    'success' => true,
+                    'message' => "CREATED",
+                ],422);
+            }
+        }catch(PDOException $e){
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ],422);
         }
     }
 
@@ -62,7 +79,11 @@ class GenericController extends Controller
     {
         $title = 'Single Group/Generic';
         $generic_name = DB::table('generic')->where('id',$id)->first();
-        return view('generic/show',compact('title','generic_name'));
+        return response()->json([
+            'success' => true,
+            'message' => $title,
+            'data' => $generic_name
+        ],200);
     }
 
     /**
@@ -75,7 +96,11 @@ class GenericController extends Controller
     {
         $title = 'Generic Name Edit';
         $generic_name = DB::table('generic')->where('id',$id)->first();
-        return view('generic/edit',compact('title','generic_name'));
+        return response()->json([
+            'success' => true,
+            'message' => $title,
+            'data' => $generic_name
+        ],200);
     }
 
     /**
@@ -87,6 +112,7 @@ class GenericController extends Controller
      */
     public function update(Request $request, $id)
     {
+
         $generic_data = [
             'generic_name' => $request->generic_name,
             'dose' => $request->dose,
@@ -95,9 +121,20 @@ class GenericController extends Controller
             'updated_by' => 1,
             'updated_at' => date('Y-m-d')
         ];
-        $result = DB::table('generic')->where('id',$id)->update($generic_data);
-        if($result){
-            return redirect('generic');
+        // return $generic_data;
+        try{
+            $result = DB::table('generic')->where('id',$id)->update($generic_data);
+            if($result){
+                return response()->json([
+                    'success' => true,
+                    'message' => "UPDATED",
+                ],200);
+            }
+        }catch(PDOException $e){
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ],422);
         }
     }
 
@@ -109,9 +146,19 @@ class GenericController extends Controller
      */
     public function destroy($id)
     {
-        $result = DB::table('generic')->where('id',$id)->delete();
-        if($result){
-            return redirect('generic');
+        try{
+            $result = DB::table('generic')->where('id',$id)->delete();
+            if($result){
+                return response()->json([
+                    'success' => true,
+                    'message' => "DELETED",
+                ],200);
+            }
+        }catch(PDOException $e){
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ],422);
         }
     }
 }
