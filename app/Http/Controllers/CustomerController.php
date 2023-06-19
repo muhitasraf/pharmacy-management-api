@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use PDOException;
 
 class CustomerController extends Controller
 {
@@ -16,7 +17,11 @@ class CustomerController extends Controller
     {
         $title = 'All Customer List';
         $customer_list = DB::table('customer')->get();
-        return view('customer/index',compact('title','customer_list'));
+        return response()->json([
+            'success' => true,
+            'message' => $title,
+            'data' => $customer_list
+        ],200);
     }
 
     /**
@@ -26,8 +31,8 @@ class CustomerController extends Controller
      */
     public function create()
     {
-        $title = 'Create New Customer';
-        return view('customer/create',compact('title'));
+        // $title = 'Create New Customer';
+        // return view('customer/create',compact('title'));
     }
 
     /**
@@ -49,9 +54,20 @@ class CustomerController extends Controller
             'updated_by' => 1,
             'updated_at' => date('Y-m-d'),
         ];
-        $result = DB::table('customer')->insert($customer_data);
-        if($result){
-            return redirect('customer');
+
+        try{
+            $result = DB::table('customer')->insert($customer_data);
+            if($result){
+                return response()->json([
+                    'success' => true,
+                    'message' => "CREATED",
+                ],422);
+            }
+        }catch(PDOException $e){
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ],422);
         }
     }
 
@@ -65,7 +81,11 @@ class CustomerController extends Controller
     {
         $title = 'Single Group/Generic';
         $customer_data = DB::table('customer')->where('id',$id)->first();
-        return view('customer/show',compact('title','customer_data'));
+        return response()->json([
+            'success' => true,
+            'message' => $title,
+            'data' => $customer_data
+        ],200);
     }
 
     /**
@@ -78,7 +98,11 @@ class CustomerController extends Controller
     {
         $title = 'Customer Edit';
         $customer_data = DB::table('customer')->where('id',$id)->first();
-        return view('customer/edit',compact('title','customer_data'));
+        return response()->json([
+            'success' => true,
+            'message' => $title,
+            'data' => $customer_data
+        ],200);
     }
 
     /**
@@ -101,9 +125,20 @@ class CustomerController extends Controller
             'updated_by' => 1,
             'updated_at' => date('Y-m-d'),
         ];
-        $result = DB::table('customer')->where('id',$id)->update($customer_data);
-        if($result){
-            return redirect('customer');
+
+        try{
+            $result = DB::table('customer')->where('id',$id)->update($customer_data);
+            if($result){
+                return response()->json([
+                    'success' => true,
+                    'message' => "UPDATED",
+                ],200);
+            }
+        }catch(PDOException $e){
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ],422);
         }
     }
 
@@ -115,9 +150,20 @@ class CustomerController extends Controller
      */
     public function destroy($id)
     {
-        $result = DB::table('customer')->where('id',$id)->delete();
-        if($result){
-            return redirect('customer');
+
+        try{
+            $result = DB::table('customer')->where('id',$id)->delete();
+            if($result){
+                return response()->json([
+                    'success' => true,
+                    'message' => "DELETED",
+                ],200);
+            }
+        }catch(PDOException $e){
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ],422);
         }
     }
 }

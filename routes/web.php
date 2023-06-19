@@ -49,6 +49,13 @@ $router->group(['prefix'=>'api/v1'], function () use ($router) {
         $router->put('company/update/{id}','CompanyController@update');
         $router->delete('company/delete/{id}','CompanyController@destroy');
 
+        $router->get('customer','CustomerController@index');
+        $router->post('customer/create','CustomerController@store');
+        $router->get('customer/{id}','CustomerController@show');
+        $router->get('customer/{id}/edit','CustomerController@edit');
+        $router->put('customer/update/{id}','CustomerController@update');
+        $router->delete('customer/delete/{id}','CustomerController@destroy');
+
     });
 
 
