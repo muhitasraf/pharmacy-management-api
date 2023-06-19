@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Purchase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use PDOException;
 
 class PurchaseController extends Controller
 {
@@ -19,7 +20,11 @@ class PurchaseController extends Controller
         $sql = "SELECT tm.*, c.company_name FROM tran_master tm
                 LEFT JOIN company c ON c.id = tm.company_id";
         $purchase_list = DB::select($sql);
-        return view('purchase/index',compact('title','purchase_list'));
+        return response()->json([
+            'success' => true,
+            'message' => $title,
+            'data' => $purchase_list
+        ],200);
     }
 
     /**
@@ -44,7 +49,17 @@ class PurchaseController extends Controller
                 LEFT JOIN company c ON b.company_id = c.id
                 LEFT JOIN type t ON b.type_id = t.id";
         $brand_list = DB::select($sql);
-        return view('purchase/create',compact('title','company_name','new_invoice_no','brand_list'));
+        // return view('purchase/create',compact('title','company_name','new_invoice_no','brand_list'));
+        return response()->json([
+            'success' => true,
+            'message' => $title,
+            'data' => [
+                'data' => $brand_list,
+                'company_name' => $company_name,
+                'new_invoice_no' => $new_invoice_no,
+                'brand_list' => $brand_list
+            ]
+        ],200);
     }
 
     /**
@@ -55,7 +70,7 @@ class PurchaseController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request);
+        $result = '';
         if(isset($request->brand_name[0]) && !empty($request->brand_name[0])){
 
             $tran_data = [
@@ -65,7 +80,16 @@ class PurchaseController extends Controller
                 'total_qty' => $request->total_qty,
                 'total_price' => $request->grand_total,
             ];
-            $result = DB::table('tran_master')->insert($tran_data);
+
+            try{
+                $result = DB::table('tran_master')->insert($tran_data);
+            }catch(PDOException $e){
+                return response()->json([
+                    'success' => false,
+                    'message' => $e->getMessage(),
+                ],422);
+            }
+
             if($result){
                 $id = DB::table('tran_master')->select('id')->orderBy('id','DESC')->first()->id;
                 for($i = 0; $i<count($request->brand_name); $i++){
@@ -79,17 +103,27 @@ class PurchaseController extends Controller
                         'tran_date' => $request->purchase_date
                     ];
                 }
-                $result = DB::table('stock_in')->insert($purchase_data);
-            }
 
-
-            if($result){
-                return redirect('purchase');
-            }else{
-                return redirect('purchase.create');
+                try{
+                    $result = DB::table('stock_in')->insert($purchase_data);
+                    if($result){
+                        return response()->json([
+                            'success' => true,
+                            'message' => "CREATED",
+                        ],200);
+                    }
+                }catch(PDOException $e){
+                    return response()->json([
+                        'success' => false,
+                        'message' => $e->getMessage(),
+                    ],422);
+                }
             }
         }else{
-            return redirect('purchase.create');
+            return response()->json([
+                'success' => false,
+                'message' => "No data found",
+            ],422);
         }
     }
 

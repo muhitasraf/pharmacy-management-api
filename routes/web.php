@@ -70,6 +70,13 @@ $router->group(['prefix'=>'api/v1'], function () use ($router) {
         $router->put('type/update/{id}','MedicineTypeController@update');
         $router->delete('type/delete/{id}','MedicineTypeController@destroy');
 
+        $router->get('purchase','PurchaseController@index');
+        $router->post('purchase/create','PurchaseController@store');
+        $router->get('purchase/{id}','PurchaseController@show');
+        $router->get('purchase/{id}/edit','PurchaseController@edit');
+        $router->put('purchase/update/{id}','PurchaseController@update');
+        $router->delete('purchase/delete/{id}','PurchaseController@destroy');
+
     });
 
 
