@@ -59,7 +59,7 @@ class GenericController extends Controller
                 return response()->json([
                     'success' => true,
                     'message' => "CREATED",
-                ],422);
+                ],200);
             }
         }catch(PDOException $e){
             return response()->json([

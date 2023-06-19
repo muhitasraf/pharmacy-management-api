@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use PDOException;
 
 class MedicineTypeController extends Controller
 {
@@ -16,7 +17,11 @@ class MedicineTypeController extends Controller
     {
         $title = 'Medicine Type List';
         $type_name = DB::table('type')->get();
-        return view('type/index',compact('title','type_name'));
+        return response()->json([
+            'success' => true,
+            'message' => $title,
+            'data' => $type_name
+        ],200);
     }
 
     /**
@@ -26,8 +31,8 @@ class MedicineTypeController extends Controller
      */
     public function create()
     {
-        $title = 'Create New Medicine Type';
-        return view('type/create',compact('title'));
+        // $title = 'Create New Medicine Type';
+        // return view('type/create',compact('title'));
     }
 
     /**
@@ -45,9 +50,20 @@ class MedicineTypeController extends Controller
             'created_by' => 1,
             'created_at' => date('Y-m-d')
         ];
-        $result = DB::table('type')->insert($type_data);
-        if($result){
-            return redirect('medicine_type');
+
+        try{
+            $result = DB::table('type')->insert($type_data);
+            if($result){
+                return response()->json([
+                    'success' => true,
+                    'message' => "CREATED",
+                ],422);
+            }
+        }catch(PDOException $e){
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ],422);
         }
     }
 
@@ -61,7 +77,11 @@ class MedicineTypeController extends Controller
     {
         $title = 'Medicine Type';
         $type_name = DB::table('type')->where('id',$id)->first();
-        return view('type/show',compact('title','type_name'));
+        return response()->json([
+            'success' => true,
+            'message' => $title,
+            'data' => $type_name
+        ],200);
     }
 
     /**
@@ -74,7 +94,11 @@ class MedicineTypeController extends Controller
     {
         $title = 'Type Name Edit';
         $type_name = DB::table('type')->where('id',$id)->first();
-        return view('type/edit',compact('title','type_name'));
+        return response()->json([
+            'success' => true,
+            'message' => $title,
+            'data' => $type_name
+        ],200);
     }
 
     /**
@@ -93,9 +117,20 @@ class MedicineTypeController extends Controller
             'updated_by' => 1,
             'updated_at' => date('Y-m-d')
         ];
-        $result = DB::table('type')->where('id',$id)->update($type_data);
-        if($result){
-            return redirect('medicine_type');
+
+        try{
+            $result = DB::table('type')->where('id',$id)->update($type_data);
+            if($result){
+                return response()->json([
+                    'success' => true,
+                    'message' => "UPDATED",
+                ],200);
+            }
+        }catch(PDOException $e){
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ],422);
         }
     }
 
@@ -107,9 +142,19 @@ class MedicineTypeController extends Controller
      */
     public function destroy($id)
     {
-        $result = DB::table('type')->where('id',$id)->delete();
-        if($result){
-            return redirect('medicine_type');
+        try{
+            $result = DB::table('type')->where('id',$id)->delete();
+            if($result){
+                return response()->json([
+                    'success' => true,
+                    'message' => "DELETED",
+                ],200);
+            }
+        }catch(PDOException $e){
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ],422);
         }
     }
 }
